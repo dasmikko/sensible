@@ -182,4 +182,4 @@ bin/*
 
 sensible.yml
 .sensible/
-rpms/
+packages/
