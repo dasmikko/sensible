@@ -13,7 +13,7 @@ export async function init(options: InitOptions) {
     const fileContents = `---
 packages:
 requirements:
-deploy:`
+tasks:`
 
     // Check if the sensible file already exists, unless force is enabled
     if (options.force) {
