@@ -1,0 +1,31 @@
+{
+  "name": "sensible",
+  "author": "Mikkel Jensen",
+  "version": "0.1.1",
+  "module": "src/index.ts",
+  "type": "module",
+  "bin": {
+    "sensible": "./index.ts"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/js-yaml": "^4.0.9",
+    "@types/semver": "^7.5.8"
+  },
+  "scripts": {
+    "build:exe": "bun build --compile --minify --sourcemap index.ts --outfile bin/sensible",
+    "build:rpm": "bun build_rpm.ts",
+    "install-bin": "./install"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "commander": "^13.1.0",
+    "consola": "^3.4.0",
+    "js-yaml": "^4.1.0",
+    "open": "^10.1.0",
+    "semver": "^7.7.1",
+    "zx": "^8.3.2"
+  }
+}

@@ -1,0 +1,6 @@
+---
+name: This is a sample task
+description: This is a sample task, and this is its description
+script: |
+  echo "This is a sample task"
+  echo "And you can use multiple lines too!"

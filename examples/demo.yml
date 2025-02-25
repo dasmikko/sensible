@@ -1,0 +1,35 @@
+---
+packages:
+  - name: volta
+    install: |
+      echo "Installing Volta"
+      \curl https://get.volta.sh | bash
+
+  - name: node
+    range: ">20.0.0"
+    install: volta install node@lts
+
+  - name: pnpm
+    install: volta install pnpm
+
+  - name: httpd
+    env:
+      - prod # Only install this package if we are in the production environment
+    install: sudo dnf install httpd -y
+
+requirements:
+  - name: mytestsite.dev is in /etc/hosts
+    check: |
+      grep -q "127.0.0.1 mytestsite.dev" /etc/hosts
+    install: |
+      if sudo -v; then
+        sudo bash -c "echo '127.0.0.1 mytestsite.dev' >> /etc/hosts"
+        echo "Line added to /etc/hosts"
+      else
+          echo "You do not have sudo privileges. Cannot append to hosts file"
+      fi
+
+tasks:
+  - name: Install node dependencies
+    task: install-node-deps # this references a file in a folder called .doctor/tasks inside your project, to prevent this file from growing too large. You can even run this task from CLI by doing: doctor task run install-node-deps
+    check: test -d node_modules
