@@ -8,6 +8,7 @@ import {runTask} from "../tasks.ts";
 import open, {openApp, apps} from 'open';
 import {$} from "zx";
 import { $ as bunShell } from "bun";
+import path from 'node:path'
 import {runZxScript} from "../shell.ts";
 
 
@@ -81,9 +82,16 @@ export async function listTasks(options: TaskListOptions) {
         for (const task of tasks) {
             const taskFilename = task
             const taskFile = Bun.file(`${taskFolder}/${task}`);
+            const taskFileType = taskFile.type.split(';')[0]
 
+            // Handle javascipt files differently
+            if (taskFileType === 'text/javascript') {
+                consola.log(`${colors.bold(taskFilename)} (${colors.yellow('zx script')})`)
+                continue
+            }
+
+            // Load the task file to get info about it
             const taskObject = yaml.load(await taskFile.text()) as TaskObject;
-
             if (options.description) {
                 consola.log(`${colors.bold(taskFilename)}: ${taskObject.name} (${taskObject.description})`)
             } else {
