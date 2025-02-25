@@ -1,6 +1,7 @@
-import {$} from "zx";
+
 import {globalArgs} from "./global.ts";
-import {$ as bunShell} from "bun";
+import {$} from "bun";
+import {consola} from "consola";
 
 /**
  * Run a shell command and return the exit code and the output
@@ -13,30 +14,44 @@ export async function runShellCommand(shellCommand: string, vars: object = {}, s
         Object.entries(vars).map(([key, value]) => [key.toUpperCase(), value])
     )
 
-    // Setup the shell function
-    const $$ = $({
-        verbose: globalArgs.verboseMode,
-        env: {
-            ...process.env, // Pass the current environment variables
-            ...varsUppercase // Pass the vars object
-        },
-        nothrow: true, // Don't throw an error if the command fails
-        quiet: !globalArgs.verboseMode, // Don't output the command
-    })
+    // Add colors
+    process.env.FORCE_COLOR='1'
 
-    // Run the shell command
-    const { stdout, stderr, exitCode } = await $$`bash -c ${shellCommand}`
+    if (globalArgs.verboseMode) {
+        consola.log(shellCommand)
+    }
 
     if (showOutput) {
-        console.log(stdout.toString().trim())
+        const { stdout, stderr, exitCode } = await $`bash -c ${shellCommand}`
+            .nothrow()
+            .env({
+                ...process.env,
+                ...varsUppercase
+            })
+
+        // Return the exit code and the output
+        return {
+            exitCode : exitCode === null ? 0 : exitCode,
+            stdout: stdout.toString(),
+            stderr: stderr.toString(),
+        }
+    } else {
+        const { stdout, stderr, exitCode } = await $`bash -c ${shellCommand}`
+            .nothrow()
+            .env({
+                ...process.env,
+                ...varsUppercase
+            })
+            .quiet()
+
+        // Return the exit code and the output
+        return {
+            exitCode : exitCode === null ? 0 : exitCode,
+            stdout: stdout.toString(),
+            stderr: stderr.toString(),
+        }
     }
 
-    // Return the exit code and the output
-    return {
-        exitCode : exitCode === null ? 0 : exitCode,
-        stdout: stdout.toString(),
-        stderr: stderr.toString(),
-    }
 }
 
 
@@ -47,7 +62,7 @@ export async function runZxScript (scriptPath: string, vars: object = {}): Promi
     )
 
     // Run the shell command
-    const { stdout, stderr, exitCode } = await bunShell`${scriptPath}`.env({
+    const { stdout, stderr, exitCode } = await $`${scriptPath}`.env({
         ...process.env,
         ...varsUppercase
     })
