@@ -1,10 +1,10 @@
-#!/usr/bin/env zx
+#!/usr/bin/env bun
 
 import pkg from './package.json'
 import { $ } from 'zx'
 
-console.log('Clearing old rpms')
-await $`rm -rf ./rpms`
+console.log('Clearing old package files')
+await $`rm -rf ./packages`
 
 console.log('Building sensible')
 await $`bun build:exe`
@@ -22,3 +22,6 @@ console.log('Moving packages to packages folder')
 await $`mkdir packages`
 await $`mv *.rpm packages/`
 await $`mv *.deb packages/`
+
+console.log('Create github release')
+await $`gh release create 0.1.2 ./packages/* --generate-notes`
