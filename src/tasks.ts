@@ -61,7 +61,7 @@ export async function handleSensibleTask(sensibleTask: SensibleTask) : Promise<b
  */
 export async function runTask(task: TaskObject, vars: object = {}) : Promise<boolean> {
     // Run the task
-    const {exitCode, stdout, stderr} = await runShellCommand(task.script, vars)
+    const {exitCode, stdout, stderr} = await runShellCommand(task.script, vars, task.showOutput)
     if (exitCode === null || exitCode > 0) {
         consola.log("Task failed.")
         consola.error(stderr)
