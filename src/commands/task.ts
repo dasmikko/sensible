@@ -7,6 +7,8 @@ import {colors} from "consola/utils";
 import {runTask} from "../tasks.ts";
 import open, {openApp, apps} from 'open';
 import {$} from "zx";
+import { $ as bunShell } from "bun";
+import {runZxScript} from "../shell.ts";
 
 
 /**
@@ -43,15 +45,22 @@ export async function taskRun(taskName: string, vars: object) : Promise<void> {
         consola.info(`Running js task: ${taskName}`)
         const scriptContent = await taskFileJs.text()
 
-        // Check if the script is a zx script
+         // Check if the script is a zx script
         if (scriptContent.startsWith('#!/usr/bin/env zx')) {
-            await $`${sensibleFolderPath}/tasks/${taskName}.js`.lines()
+            const {exitCode} = await runZxScript(`${sensibleFolderPath}/tasks/${taskName}.js`, vars)
+
+            if (exitCode === 0) {
+                consola.success("Task completed successfully.")
+            } else {
+                consola.error("Task failed.")
+            }
+        } else {
+            consola.error("Only zx scripts are supported.")
+            process.exit(1)
         }
 
         return
     }
-
-
 
     consola.error("task does not exist.");
     process.exit(1);
