@@ -1,6 +1,7 @@
 export type TaskObject = {
     name: string,
     description: string,
+    showOutput: boolean
     script: string,
 }
 
