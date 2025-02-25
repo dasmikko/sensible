@@ -1,0 +1,9 @@
+-s dir
+--name sensible
+--architecture all
+-f
+--description "A sensible project manager"
+--url "https://github.com/dasmikko/sensible"
+--maintainer "Mikkel Jensen"
+
+./bin/sensible=/usr/bin/sensible

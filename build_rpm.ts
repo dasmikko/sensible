@@ -8,10 +8,17 @@ await $`rm -rf ./rpms`
 
 console.log('Building sensible')
 await $`bun build:exe`
+$.verbose = true
+$.nothrow = true
 
 console.log(`Creating RPM package for sensible version ${pkg.version}`)
-await $`fpm -s dir -t rpm -n sensible -v ${pkg.version} ./bin/sensible=/usr/bin/sensible`
+await $`fpm -t rpm -v ${pkg.version}`
 
-console.log('Moving RPM package to rpms folder')
-await $`mkdir rpms`
-await $`mv *.rpm rpms/`
+console.log(`Creating DEB package for sensible version ${pkg.version}`)
+await $`fpm -t deb -v ${pkg.version}`
+
+
+console.log('Moving packages to packages folder')
+await $`mkdir packages`
+await $`mv *.rpm packages/`
+await $`mv *.deb packages/`
