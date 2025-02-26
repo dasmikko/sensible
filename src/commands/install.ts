@@ -7,13 +7,20 @@ import {handleSensibleTask} from "../tasks.ts";
 import {isInCurrentEnvironment} from "../utils/environment.ts";
 import type {PackageObject} from "../types/package.ts";
 
+type InstallOptions = {
+    force: boolean,
+    verbose: boolean,
+}
+
 /**
  * Install command, checks and install packages, and requirements
  * @param options
  */
-export async function install(options: object) {
+export async function install(options: InstallOptions) {
     // Check if there is a sensible.yml in the current path
     await loadSensibleFile();
+
+    console.log(options)
 
     // Handle pre-tasks
     let preTasks = sensibleObject?.preTasks?.filter(task => isInCurrentEnvironment(task.env));
@@ -32,7 +39,7 @@ export async function install(options: object) {
     let packages = sensibleObject?.packages?.filter(pkg => isInCurrentEnvironment(pkg.env));
     if (packages && packages.length > 0) {
         consola.start("Checking for required packages...");
-        const status = await checkAndInstallPackages(packages as [PackageObject]);
+        const status = await checkAndInstallPackages(packages as [PackageObject], options.force);
 
         if (!status) {
             consola.error("One or more packages failed installing.");
