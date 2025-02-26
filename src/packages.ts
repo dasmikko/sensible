@@ -4,7 +4,6 @@ import {colors} from "consola/utils";
 import semver from "semver";
 import { runShellCommand } from "./shell.ts";
 
-import {globalArgs} from "./global.ts";
 import {parseVersion} from "./utils/version.ts";
 import {isInCurrentEnvironment} from "./utils/environment.ts";
 
@@ -21,7 +20,6 @@ export async function checkPackage(packageObj: PackageObject): Promise<boolean> 
         consola.fail(`${colors.bold(packageObj.name)} not found.`);
         return false
     }
-
 
     const versionString = await getPackageVersion(packageObj);
     const packageVersion = parseVersion(versionString);
