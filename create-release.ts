@@ -24,4 +24,4 @@ await $`mv *.rpm packages/`
 await $`mv *.deb packages/`
 
 console.log('Create github release')
-await $`gh release create 0.1.2 ./packages/* --generate-notes`
+await $`gh release create ${pkg.version} ./packages/* --generate-notes`
