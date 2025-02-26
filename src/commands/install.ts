@@ -20,8 +20,6 @@ export async function install(options: InstallOptions) {
     // Check if there is a sensible.yml in the current path
     await loadSensibleFile();
 
-    console.log(options)
-
     // Handle pre-tasks
     let preTasks = sensibleObject?.preTasks?.filter(task => isInCurrentEnvironment(task.env));
     if (preTasks && preTasks.length > 0) {
