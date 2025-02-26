@@ -2,10 +2,13 @@
 import {globalArgs} from "./global.ts";
 import {$} from "bun";
 import {consola} from "consola";
+import {sleep} from "zx";
 
 /**
  * Run a shell command and return the exit code and the output
  * @param shellCommand
+ * @param vars
+ * @param showOutput If true, the output will be shown in the console NOTE: This will not return the output in the return object
  * @returns {Promise<{exitCode: number, stdout: string, stderr: string}>}
  */
 export async function runShellCommand(shellCommand: string, vars: object = {}, showOutput: boolean = false): Promise<{ exitCode: number, stdout: string, stderr: string }> {
@@ -21,35 +24,24 @@ export async function runShellCommand(shellCommand: string, vars: object = {}, s
         consola.log(shellCommand)
     }
 
-    if (showOutput) {
-        const { stdout, stderr, exitCode } = await $`bash -c ${shellCommand}`
-            .nothrow()
-            .env({
-                ...process.env,
-                ...varsUppercase
-            })
+    let proc = Bun.spawn({
+        cmd: ["bash", '-lc', shellCommand],
+        env: { ...process.env, ...varsUppercase },
+        stdout: showOutput ? 'inherit' : 'pipe',
+        stderr: showOutput ? 'inherit' : 'pipe',
+        stdin: 'inherit'
+    });
 
-        // Return the exit code and the output
-        return {
-            exitCode : exitCode === null ? 0 : exitCode,
-            stdout: stdout.toString(),
-            stderr: stderr.toString(),
-        }
-    } else {
-        const { stdout, stderr, exitCode } = await $`bash -c ${shellCommand}`
-            .nothrow()
-            .env({
-                ...process.env,
-                ...varsUppercase
-            })
-            .quiet()
+    // Wait for the process to exit
+    const exitCode = await proc.exited
+    const stdout = (await new Response(proc.stdout).text()).toString().trim()
+    const stderr = await new Response(proc.stderr).text()
 
-        // Return the exit code and the output
-        return {
-            exitCode : exitCode === null ? 0 : exitCode,
-            stdout: stdout.toString(),
-            stderr: stderr.toString(),
-        }
+    // Return the exit code and the output
+    return {
+        exitCode,
+        stdout,
+        stderr,
     }
 
 }
