@@ -1,6 +1,11 @@
 # Sensible
 A small tool to manage and deploy projects.
 
+## NOTICE
+The tool is still in very early development, and it's not ready for production use.
+
+Everything is subject to change, and the tool is not stable.
+
 ## Why?
 The reason I made this tool, is I work on a lot of project at work, and we are a very small team. We work on separate things for the same projects, like I work on the frontend, and the other guy on the database.
 He has his own tooling, and need a bunch of stuff installed and various settings set in files, to run the database. I have also my own tooling, and we often have to spend a lot of time helping with setting up our part of the project for each other so we can run them locally.
