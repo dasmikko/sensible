@@ -10,9 +10,9 @@ import { init } from "./src/commands/init.ts"
 import { install } from "./src/commands/install.ts"
 import {listTasks, taskCreate, taskRun} from "./src/commands/task.ts";
 
-const preAction = (_: Command, actionCommand: Command) => {
+const preAction = async (_: Command, actionCommand: Command) => {
     // Initialize the global arguments
-    initArgs(actionCommand.optsWithGlobals())
+    await initArgs(actionCommand.optsWithGlobals())
 
     if (actionCommand.optsWithGlobals().prod) {
         consola.info('Production mode enabled')

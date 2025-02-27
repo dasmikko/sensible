@@ -3,5 +3,10 @@ export type GlobalArgsObject = {
     verboseMode: boolean
     sensibleFolder: string
     sensibleFilePath: string
-    localSensibleFolder: string
+    localSensibleFolder: string,
+    projectUser: string | null
+}
+
+export type rcObject = {
+    projectUser: string
 }

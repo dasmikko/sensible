@@ -2,7 +2,7 @@ import path from 'node:path'
 import {consola} from "consola";
 import type {SensibleObject} from "./types/sensible.ts";
 import yaml from "js-yaml";
-import type {GlobalArgsObject} from "./types/global.ts";
+import type {GlobalArgsObject, rcObject} from "./types/global.ts";
 
 /**
  * Global arguments object
@@ -13,6 +13,7 @@ export const globalArgs: GlobalArgsObject = {
     sensibleFolder: '',
     sensibleFilePath: '',
     localSensibleFolder: '',
+    projectUser: null
 }
 
 /**
@@ -24,13 +25,24 @@ export let sensibleObject: SensibleObject;
  * Initialize the global arguments
  * @param argv
  */
-export function initArgs(argv: any) {
+export async function initArgs(argv: any) {
     const currentPath: string = process.cwd();
     globalArgs.environment = argv.env
     globalArgs.verboseMode = argv.verbose
     globalArgs.sensibleFolder = path.join(currentPath, String(argv.sensibleFolder));
     globalArgs.localSensibleFolder = path.join(path.dirname(Bun.main), argv.sensibleFolder);
     globalArgs.sensibleFilePath = argv.doctorFile || 'sensible.yml';
+
+    // Check if the .sensiblerc file exists
+    const rcFile = Bun.file('.sensiblerc');
+    const rcExists = await rcFile.exists();
+
+    if (rcExists) {
+        const rcObject = yaml.load(await rcFile.text()) as rcObject;
+
+        if (rcObject.projectUser) globalArgs.projectUser = rcObject.projectUser;
+    }
+
 }
 
 /**
