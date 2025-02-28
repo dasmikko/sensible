@@ -60,6 +60,11 @@ export async function handleSensibleTask(sensibleTask: SensibleTask) : Promise<b
  * @param local
  */
 export async function runTask(task: TaskObject, vars: object = {}) : Promise<boolean> {
+    if (!task.script) {
+        consola.error("Task does not have a script. Exiting...")
+        return false
+    }
+
     // Run the task
     const {exitCode, stdout, stderr} = await runShellCommand(task.script, vars, task.showOutput)
     if (exitCode === null || exitCode > 0) {

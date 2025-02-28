@@ -6,11 +6,10 @@ import { readdir } from "node:fs/promises";
 import {colors} from "consola/utils";
 import {runTask} from "../tasks.ts";
 import open, {openApp, apps} from 'open';
-import {$} from "zx";
-import { $ as bunShell } from "bun";
+import { Glob } from 'bun'
+import {runScript} from "../shell.ts";
 import path from 'node:path'
-import {runZxScript} from "../shell.ts";
-
+import fs from 'node:fs/promises'
 
 /**
  * Run a task command
@@ -19,15 +18,30 @@ import {runZxScript} from "../shell.ts";
 export async function taskRun(taskName: string, vars: object) : Promise<void> {
     let sensibleFolderPath = globalArgs.sensibleFolder
 
-    // Find the task inside sensible folder
-    const taskFileYml = Bun.file(`${sensibleFolderPath}/tasks/${taskName}.yml`)
-    const taskFileJs = Bun.file(`${sensibleFolderPath}/tasks/${taskName}.js`)
+    const taskFileGlob = new Glob(`${sensibleFolderPath}/tasks/${taskName}*`);
 
-    // Run the yaml file if it exists
-    if (await taskFileYml.exists()) {
+    let foundFiles = []
+    for await (const file of taskFileGlob.scan(".")) {
+        foundFiles.push(path.basename(file));
+    }
+
+    if (foundFiles.length > 1) {
+        consola.error("Multiple task files found with the same name. Please rename the tasks");
+        process.exit(1)
+    }
+
+    if (foundFiles.length === 0) {
+        consola.error("task does not exist.");
+        process.exit(1);
+    }
+
+
+    const taskFileName = foundFiles[0]
+    const taskFile = Bun.file(`${sensibleFolderPath}/tasks/${taskFileName}`)
+
+    if (taskFileName.endsWith(".yml")) {
         // Load the task file
-        const taskObject = yaml.load(await taskFileYml.text()) as TaskObject;
-
+        const taskObject = yaml.load(await taskFile.text()) as TaskObject;
 
         consola.info(`Running task: ${taskName}`)
 
@@ -40,32 +54,24 @@ export async function taskRun(taskName: string, vars: object) : Promise<void> {
 
         return
     }
-    
-    // Run the js file if it exists
-    if (await taskFileJs.exists()) {
-        consola.info(`Running js task: ${taskName}`)
-        const scriptContent = await taskFileJs.text()
 
-         // Check if the script is a zx script
-        if (scriptContent.startsWith('#!/usr/bin/env zx')) {
-            const {exitCode} = await runZxScript(`${sensibleFolderPath}/tasks/${taskName}.js`, vars)
 
-            if (exitCode === 0) {
-                consola.success("Task completed successfully.")
-            } else {
-                consola.error("Task failed.")
-            }
-        } else {
-            consola.error("Only zx scripts are supported.")
-            process.exit(1)
-        }
-
-        return
+    try {
+        await fs.access(`${sensibleFolderPath}/tasks/${foundFiles[0]}`, fs.constants.X_OK);
+    } catch (error) {
+        consola.error("Task file is not executable.");
+        process.exit(1)
     }
 
-    consola.error("task does not exist.");
-    process.exit(1);
 
+    consola.info(`Running script task: ${taskName}`)
+    const {exitCode} = await runScript(`${sensibleFolderPath}/tasks/${taskFileName}`, vars)
+
+    if (exitCode === 0) {
+        consola.success("Task completed successfully.")
+    } else {
+        consola.error("Task failed.")
+    }
 }
 
 type TaskListOptions = {

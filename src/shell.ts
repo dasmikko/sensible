@@ -1,8 +1,6 @@
-
 import {globalArgs} from "./global.ts";
 import {$} from "bun";
 import {consola} from "consola";
-import {sleep} from "zx";
 
 /**
  * Run a shell command and return the exit code and the output
@@ -46,22 +44,35 @@ export async function runShellCommand(shellCommand: string, vars: object = {}, s
 
 }
 
-
-export async function runZxScript (scriptPath: string, vars: object = {}): Promise<{ exitCode: number, stdout: string, stderr: string }> {
+/**
+ * Run a script and return the exit code and the output
+ * @param scriptPath
+ * @param vars
+ */
+export async function runScript (scriptPath: string, vars: object = {}): Promise<{ exitCode: number, stdout: string, stderr: string }> {
     // Prepare vars by making keys uppercase
     const varsUppercase = Object.fromEntries(
         Object.entries(vars).map(([key, value]) => [key.toUpperCase(), value])
     )
 
     // Run the shell command
-    const { stdout, stderr, exitCode } = await $`${scriptPath}`.env({
-        ...process.env,
-        ...varsUppercase
-    })
+    let proc = Bun.spawn({
+        cmd: ["bash", '-lc', `${scriptPath}`],
+        env: { ...process.env, ...varsUppercase },
+        stdout: 'inherit' ,
+        stderr: 'inherit',
+        stdin: 'inherit'
+    });
 
+    // Wait for the process to exit
+    const exitCode = await proc.exited
+    const stdout = (await new Response(proc.stdout).text()).toString().trim()
+    const stderr = await new Response(proc.stderr).text()
+
+    // Return the exit code and the output
     return {
-        exitCode : exitCode === null ? 0 : exitCode,
-        stdout: stdout.toString(),
-        stderr: stderr.toString(),
+        exitCode,
+        stdout,
+        stderr,
     }
 }
