@@ -83,7 +83,7 @@ taskCommand.command('run')
 
 taskCommand.command('list')
     .description('List available tasks')
-    .option('-d, --description', 'Show descriptions', false)
+    .option('--description', 'Show descriptions', false)
     .hook('preAction', preAction)
     .action(async (options) => {
         await listTasks(options)

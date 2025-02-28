@@ -81,22 +81,32 @@ export async function listTasks(options: TaskListOptions) {
 
         for (const task of tasks) {
             const taskFilename = task
+            const taskFilenameWoExt = taskFilename.split('.').slice(0, -1).join('.')
             const taskFile = Bun.file(`${taskFolder}/${task}`);
             const taskFileType = taskFile.type.split(';')[0]
 
             // Handle javascipt files differently
             if (taskFileType === 'text/javascript') {
-                consola.log(`${colors.bold(taskFilename)} (${colors.yellow('zx script')})`)
+                consola.log(`${colors.bold(taskFilenameWoExt)} (${colors.yellow('zx script')})`)
                 continue
             }
 
+
+
             // Load the task file to get info about it
             const taskObject = yaml.load(await taskFile.text()) as TaskObject;
-            if (options.description) {
-                consola.log(`${colors.bold(taskFilename)}: ${taskObject.name} (${taskObject.description})`)
-            } else {
-                consola.log(`${colors.bold(taskFilename)}: ${taskObject.name}`)
+
+            let outputString = `${colors.bold(taskFilenameWoExt)}`
+
+            if (taskObject.name) {
+                outputString += ` - ${taskObject.name}`
             }
+
+            if (options.description && taskObject.description) {
+                outputString += ` (${taskObject.description})`
+            }
+
+            consola.log(outputString)
         }
     } catch (e: any) {
         // Handle error
