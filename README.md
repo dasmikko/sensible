@@ -99,7 +99,7 @@ tasks:
       - <environment 1>
       - <environment 2>
 ``` 
-A task in the sensible file has the folowing properties:
+A task in the sensible file has the following properties:
 - name: The name of the task
 - task: The name of the task file without the .yml extension
 - env: The list of environments the task should be run in. The default is `dev`, and if you omit this property, it will be run in every environment.
@@ -113,8 +113,8 @@ The tasks should be defined like this:
 ---
 name: Example task
 description: This is an example task, showing how to define a task
+showOutput: true | false # Default is false
 script: echo "This is an example task"
-
 ```
 You can use | to make multiline scripts
 ```yaml
@@ -128,10 +128,15 @@ script: |
 ```
 The script part is pure bash script. You can use any bash command in the script.
 
+Tasks has the following properties:
+- name: The name of the task
+- description: A description of the task
+- showOutput: If the output of the task should be shown in the terminal. Default is false
+- script: The bash script that should be run
+- env: The list of environments the task should be run in. The default is `dev`, and if you omit this property, it will be run in every environment.
+
 #### Using tasks
 Use tasks to help setting up parts of your project easily, and document the setup process.
-
-
 
 To use the task in your sensible.yml file, you can reference the task like this:
 
