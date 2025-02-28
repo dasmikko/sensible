@@ -18,7 +18,13 @@ import fs from 'node:fs/promises'
 export async function taskRun(taskName: string, vars: object) : Promise<void> {
     let sensibleFolderPath = globalArgs.sensibleFolder
 
-    const taskFileGlob = new Glob(`${sensibleFolderPath}/tasks/${taskName}*`);
+    // Make sure the tasks folder exists
+    try {
+        await readdir(`${sensibleFolderPath}/tasks`)
+    } catch (e) {
+        consola.error("You don't have any tasks yet. Create a task first.");
+        process.exit(1);
+    }
 
     let foundFiles = []
     for await (const file of taskFileGlob.scan(".")) {
