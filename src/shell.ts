@@ -35,6 +35,10 @@ export async function runShellCommand(shellCommand: string, vars: object = {}, s
     const stdout = (await new Response(proc.stdout).text()).toString().trim()
     const stderr = await new Response(proc.stderr).text()
 
+    if (globalArgs.verboseMode && !showOutput) {
+        consola.log(stdout)
+    }
+
     // Return the exit code and the output
     return {
         exitCode,
