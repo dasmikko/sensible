@@ -6,6 +6,7 @@ import {colors} from "consola/utils";
 import {handleSensibleTask} from "../tasks.ts";
 import {isInCurrentEnvironment} from "../utils/environment.ts";
 import type {PackageObject} from "../types/package.ts";
+import { $ } from 'bun'
 
 type InstallOptions = {
     force: boolean,
@@ -108,4 +109,6 @@ export async function install(options: InstallOptions) {
 
         console.log('')
     }
+
+    consola.info('Installation done. You might have to restart your shell to apply changes.')
 }
