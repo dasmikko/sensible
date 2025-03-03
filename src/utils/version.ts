@@ -10,7 +10,6 @@ export function parseVersion(versionString: string): SemVer | null | string {
     try {
         const packageVersion = semver.coerce(versionString);
 
-        console.log(packageVersion)
         if (packageVersion === null) {
             if (globalArgs.verboseMode) consola.error(`Version could not be parsed from "${String(versionString)}"`)
 
