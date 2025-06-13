@@ -2,9 +2,7 @@
 A small tool to manage and deploy projects.
 
 ## NOTICE
-The tool is still in very early development, and it's not ready for production use.
-
-Everything is subject to change, and the tool is not stable.
+This tool has been rewritten in ruby. Please check the maintained repository here: https://github.com/dasmikko/sensible-ruby
 
 ## Why?
 The reason I made this tool, is I work on a lot of project at work, and we are a very small team. We work on separate things for the same projects, like I work on the frontend, and the other guy on the database.
